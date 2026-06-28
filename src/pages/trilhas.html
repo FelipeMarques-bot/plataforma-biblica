@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Trilhas - Plataforma Bíblica</title>
+  <link rel="stylesheet" href="../../public/dist/output.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="../js/app.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500&display=swap');
+  </style>
+</head>
+<body class="bg-background min-h-screen" x-data="trilhas()">
+
+  <!-- Header Flutuante -->
+  <header class="fixed top-0 left-0 right-0 z-50 glass-header border-b border-muted/30 px-8 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="dashboard.html" class="text-text/60 hover:text-primary transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </a>
+      <h1 class="font-heading text-heading-sm text-primary" x-text="modulos[0].nome">Módulo 1: O Princípio</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="font-body text-sm text-text/60">690 XP</span>
+      <div class="w-8 h-8 bg-accent/20 rounded-full flex items-center justify-center">
+        <span class="text-accent text-xs font-bold">34</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo -->
+  <main class="pt-24 pb-16 px-4">
+    <div class="max-w-2xl mx-auto">
+
+      <!-- Path vertical -->
+      <div class="relative">
+        <!-- Linha vertical -->
+        <div class="absolute left-1/2 top-0 bottom-0 w-1 -translate-x-1/2">
+          <!-- Completed line -->
+          <div class="absolute top-0 w-full bg-accent transition-all duration-500" style="height: 60%"></div>
+          <!-- Locked line -->
+          <div class="absolute bottom-0 w-full bg-muted" style="height: 40%"></div>
+        </div>
+
+        <!-- Nós -->
+        <div class="relative space-y-24">
+          <template x-for="(licao, idx) in modulos[0].licoes" :key="licao.id">
+            <div
+              class="relative flex items-center"
+              :class="idx % 2 === 0 ? 'flex-row' : 'flex-row-reverse'"
+            >
+
+              <!-- Label (alternado) -->
+              <div
+                class="w-1/2 px-8"
+                :class="idx % 2 === 0 ? 'text-right' : 'text-left'"
+              >
+                <template x-if="licao.status !== 'locked'">
+                  <div>
+                    <p class="font-body text-sm text-text/80 font-medium" x-text="licao.titulo"></p>
+                    <p class="font-body text-xs text-text/50">Clique para iniciar</p>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Nó -->
+              <div class="absolute left-1/2 -translate-x-1/2 z-10">
+                <div
+                  class="w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300"
+                  :class="{
+                    'bg-surface border-2 border-accent shadow-gold pulse-gold': licao.status === 'active',
+                    'bg-surface border-2 border-accent/50 shadow-soft': licao.status === 'completed',
+                    'bg-muted border-2 border-muted cursor-not-allowed': licao.status === 'locked'
+                  }"
+                  @click="openLesson(licao)"
+                  @mouseenter="setActive(licao)"
+                >
+                  <span
+                    class="text-xl"
+                    :class="{ 'opacity-40': licao.status === 'locked' }"
+                    x-text="licao.icone"
+                  ></span>
+                </div>
+                <!-- Check em completed -->
+                <template x-if="licao.status === 'completed'">
+                  <div class="absolute -top-1 -right-1 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
+                    <svg class="w-3 h-3 text-surface" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </div>
+                </template>
+              </div>
+
+              <!-- Espaço vazio do outro lado -->
+              <div class="w-1/2"></div>
+
+            </div>
+          </template>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

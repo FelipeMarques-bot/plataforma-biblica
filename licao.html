@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição — Plataforma Bíblica</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body>
+  <div x-data="licaoApp()" class="min-h-screen bg-background flex flex-col">
+    <!-- Top Bar -->
+    <div class="bg-surface border-b border-muted px-8 py-4 flex items-center justify-between">
+      <a href="trilhas.html" class="flex items-center gap-2 text-text/60 hover:text-primary transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        <span class="text-small uppercase tracking-wide">Voltar ao mapa</span>
+      </a>
+      <span class="font-heading text-heading text-primary">Gênesis 3 — A Queda</span>
+      <span class="text-small-uppercase text-text/40" x-text="'Questão ' + (currentQuestion + 1) + ' de ' + questions.length"></span>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 flex justify-center px-8 py-12">
+      <div class="w-full max-w-[680px]">
+        <!-- Progress Bar -->
+        <div class="w-full h-2 rounded-sm bg-muted overflow-hidden mb-10">
+          <div class="h-full bg-primary rounded-sm transition-all duration-500 ease-out" :style="'width: ' + progressPct + '%'"></div>
+        </div>
+
+        <!-- Question -->
+        <template x-if="!showResult">
+          <div class="bg-surface rounded-md shadow-soft p-8">
+            <h2 class="font-heading text-heading text-primary mb-8 leading-relaxed" x-text="questions[currentQuestion].question"></h2>
+
+            <!-- Options -->
+            <div class="space-y-3">
+              <template x-for="(option, index) in questions[currentQuestion].options" :key="index">
+                <button @click="selectOption(index)"
+                        class="w-full text-left px-5 py-4 rounded-sm border transition-all duration-300"
+                        :class="{
+                          'border-primary bg-primary/5 shadow-soft': selectedIndex === index && !answered,
+                          'border-muted hover:border-primary hover:shadow-soft': selectedIndex !== index && !answered,
+                          'border-green-500 bg-green-50': answered && option.correct,
+                          'border-red-400 bg-red-50 animate-shake': answered && selectedIndex === index && !option.correct,
+                          'border-muted opacity-60': answered && selectedIndex !== index && !option.correct
+                        }"
+                        :disabled="answered">
+                  <span class="font-body text-body text-text" x-text="option.text"></span>
+                </button>
+              </template>
+            </div>
+
+            <!-- Answer Feedback -->
+            <div x-show="answered" class="mt-6 p-4 rounded-sm animate-slide-up" :class="isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'">
+              <div class="flex items-center gap-2 mb-1">
+                <svg x-show="isCorrect" class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <svg x-show="!isCorrect" class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span class="font-heading font-semibold" :class="isCorrect ? 'text-green-700' : 'text-red-600'" x-text="isCorrect ? 'Boa! Você acertou.' : 'Não foi dessa vez.'"></span>
+              </div>
+              <p class="text-small text-text/60 mt-1" x-text="questions[currentQuestion].explanation"></p>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-between mt-8">
+              <!-- Tutor IA Button -->
+              <button @click="toggleTutor()" class="flex items-center gap-2 px-5 py-2.5 rounded-sm border border-accent bg-surface text-accent hover:shadow-gold transition-all duration-300">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                <span class="text-small font-medium">Pedir Dica</span>
+              </button>
+
+              <!-- Submit / Continue -->
+              <button x-show="!answered" @click="submitAnswer()" :disabled="selectedIndex === null"
+                      class="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
+                      :class="selectedIndex !== null ? '' : ''">
+                Verificar
+              </button>
+              <button x-show="answered" @click="nextQuestion()" class="btn-primary">
+                <span x-text="currentQuestion < questions.length - 1 ? 'Continuar' : 'Finalizar'"></span>
+              </button>
+            </div>
+
+            <!-- Tutor Popover -->
+            <div x-show="showTutor" x-cloak @click.outside="showTutor = false" class="mt-4 p-4 rounded-sm border border-accent bg-surface shadow-gold animate-fade-in">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </div>
+                <div>
+                  <p class="font-body text-body text-text" x-text="questions[currentQuestion].hint"></p>
+                  <button class="text-small text-accent font-medium mt-2 hover:underline">Ver explicação completa →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- Result Screen -->
+        <template x-if="showResult">
+          <div class="bg-surface rounded-md shadow-soft p-8 text-center animate-fade-in">
+            <div class="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6 animate-xp">
+              <svg class="w-10 h-10 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <h2 class="font-heading text-heading-lg text-primary mb-2">Lição concluída!</h2>
+            <div class="flex items-center justify-center gap-1 text-accent text-heading-xl font-heading font-semibold mb-4">
+              <span x-data="{ count: 0 }" x-init="() => { const interval = setInterval(() => { count = count + 10; if (count >= 120) { count = 120; clearInterval(interval); } }, 40); }" x-text="count"></span>
+              <span class="text-heading">XP</span>
+            </div>
+            <p class="text-text/60 mb-8">Continue sua jornada para desbloquear novos módulos e recompensas.</p>
+            <div class="flex items-center justify-center gap-4">
+              <a href="serie-ouro.html" class="btn-accent inline-flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+                Ver recompensas
+              </a>
+              <a href="trilhas.html" class="btn-ghost">Voltar ao mapa</a>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function licaoApp() {
+      return {
+        currentQuestion: 0,
+        selectedIndex: null,
+        answered: false,
+        showTutor: false,
+        showResult: false,
+        questions: [
+          {
+            question: 'Qual foi a consequência imediata da desobediência de Adão e Eva?',
+            options: [
+              { text: 'Foram expulsos do Jardim do Éden e perderam a comunhão direta com Deus.', correct: true },
+              { text: 'Deus os destruiu imediatamente com fogo do céu.', correct: false },
+              { text: 'Foram transformados em anjos caídos.', correct: false },
+              { text: 'Ganharam conhecimento infinito e se tornaram deuses.', correct: false },
+            ],
+            explanation: 'Deus os expulsou do Éden para que não comessem também da árvore da vida, e colocou querubins para guardar o caminho (Gênesis 3:22-24).',
+            hint: 'Pense no que Deus falou sobre "poeira" e o que Ele colocou para guardar o caminho de volta à árvore da vida.'
+          },
+          {
+            question: 'O que a "Serpente" representa nessa passagem?',
+            options: [
+              { text: 'Um animal comum que falava por milagre.', correct: false },
+              { text: 'Satanás disfarçado, que tentou Eva distorcendo a Palavra de Deus.', correct: true },
+              { text: 'Uma visão que Adão teve enquanto dormia.', correct: false },
+              { text: 'Um anjo enviado por Deus para testar a fé deles.', correct: false },
+            ],
+            explanation: 'Apocalipse 12:9 identifica a serpente antiga como Satanás. Ele distorceu a ordem de Deus ("É assim que Deus disse?") para semear dúvida.',
+            hint: 'Mais tarde nas Escrituras, essa serpente é identificada como o "pai da mentira".'
+          },
+          {
+            question: 'Qual promessa implícita de redenção aparece em Gênesis 3:15?',
+            options: [
+              { text: 'Deus prometeu que enviaria um Salvador da descendência da mulher que esmagaria a cabeça da serpente.', correct: true },
+              { text: 'Deus prometeu que eles viveriam para sempre mesmo no pecado.', correct: false },
+              { text: 'Deus prometeu destruir a humanidade e recomeçar com os anjos.', correct: false },
+              { text: 'Deus prometeu que a serpente se tornaria amiga do homem.', correct: false },
+            ],
+            explanation: 'Gênesis 3:15 é chamado de "Protoevangelho" — o primeiro anúncio do evangelho. A semente da mulher (Cristo) esmagaria a cabeça da serpente.',
+            hint: 'É chamado de "Protoevangelho" pelos teólogos — o primeiro evangelho.'
+          }
+        ],
+        get progressPct() {
+          return ((this.currentQuestion) / this.questions.length) * 100;
+        },
+        get isCorrect() {
+          if (this.selectedIndex === null) return false;
+          return this.questions[this.currentQuestion].options[this.selectedIndex].correct;
+        },
+        selectOption(index) {
+          if (this.answered) return;
+          this.selectedIndex = index;
+        },
+        submitAnswer() {
+          if (this.selectedIndex === null) return;
+          this.answered = true;
+          if (!this.isCorrect) {
+            this.showTutor = true;
+          }
+        },
+        toggleTutor() {
+          this.showTutor = !this.showTutor;
+        },
+        nextQuestion() {
+          if (this.currentQuestion < this.questions.length - 1) {
+            this.currentQuestion++;
+            this.selectedIndex = null;
+            this.answered = false;
+            this.showTutor = false;
+          } else {
+            this.showResult = true;
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>

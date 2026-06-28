@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Dashboard - Plataforma Bíblica{% endblock %}
+{% block content %}
+<div class="flex min-h-screen" x-data="dashboard()" x-init='initData({{ xp_semanal|safe }}, {{ streak }}, {{ xp_total }}, {{ nivel }}, {{ nivel_progresso }})'>
+
+  {% include 'includes/sidebar.html' %}
+
+  <main class="flex-1 p-8 overflow-y-auto">
+
+    <div class="mb-8">
+      <h1 class="font-heading text-heading-md text-primary">Bom dia, {{ user_full_name }}!</h1>
+      <p class="font-body text-text/60 mt-1">Continue sua jornada de estudos</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6">
+      <div class="col-span-2 space-y-6">
+        <div class="stat-card flex items-center gap-6">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center">
+              <svg class="w-7 h-7 text-accent" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="font-heading text-[40px] text-primary leading-none" x-text="streak"></p>
+              <p class="font-body text-label text-text/60 mt-1">Sequência de estudos</p>
+            </div>
+          </div>
+          <div class="flex-1">
+            <p class="font-body text-label text-text/60 mb-2">XP Semanal</p>
+            <div class="flex items-end gap-1.5 h-16">
+              <template x-for="(d, i) in xpData" :key="i">
+                <div class="flex-1 flex flex-col items-center gap-1 group relative">
+                  <div class="w-full rounded-sm transition-all duration-300 cursor-pointer"
+                    :class="i === xpData.length - 1 ? 'bg-primary' : 'bg-muted'"
+                    :style="'height: ' + (d.xp / maxXp * 100) + '%'">
+                  </div>
+                  <span class="font-body text-[11px] text-text/50" x-text="d.day"></span>
+                  <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" x-text="'XP: ' + d.xp"></div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <h3 class="font-heading text-heading-sm text-primary mb-4">Atividade Recente</h3>
+          <div class="space-y-3">
+            {% for p in licoes_recentes %}
+            <div class="flex items-center justify-between py-2 border-b border-muted/50">
+              <span class="font-body text-text">Lição: {{ p.licao.titulo }}</span>
+              <span class="font-body text-sm text-accent font-medium">+{{ p.xp_ganho_sessao }} XP</span>
+            </div>
+            {% empty %}
+            <div class="py-4 text-center">
+              <p class="font-body text-text/50">Nenhuma lição concluída ainda.</p>
+              <p class="font-body text-sm text-text/50">Inicie sua primeira lição agora!</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        {% if proxima_licao %}
+        <div class="stat-card">
+          <div class="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+            <span class="text-accent text-xl">{{ proxima_licao.trilha.icone }}</span>
+          </div>
+          <h3 class="font-heading text-heading-sm text-primary mb-2">Continuar: {{ proxima_licao.titulo }}</h3>
+          <p class="font-body text-sm text-text/60 mb-6">{{ proxima_licao.trilha.nome }}</p>
+          <a href="{% url 'licao' proxima_licao.id %}" class="btn-primary w-full text-center inline-block">
+            Continuar lição
+          </a>
+        </div>
+        {% endif %}
+
+        <div class="stat-card bg-primary text-surface">
+          <p class="font-body text-label text-accent mb-2">Total de XP</p>
+          <p class="font-heading text-heading-md text-surface" x-text="totalXp + ' XP'"></p>
+          <div class="w-full bg-white/20 rounded-full h-2 mt-4">
+            <div class="bg-accent h-2 rounded-full" :style="'width: ' + nivelProgresso + '%'"></div>
+          </div>
+          <p class="font-body text-xs text-white/70 mt-2" x-text="'Nível ' + nivel + ' — Próximo nível em ' + xpParaProximo + ' XP'"></p>
+        </div>
+
+        {% if desafio_hoje and not desafio_concluido %}
+        <div class="stat-card border border-accent/30">
+          <p class="font-body text-label text-accent mb-2">Desafio do Dia</p>
+          <p class="font-body text-sm text-text mb-3">{{ desafio_hoje.titulo }}</p>
+          <a href="{% url 'desafio_diario' %}" class="btn-accent w-full text-center inline-block text-sm">Fazer desafio</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('dashboard', () => ({
+      streak: 0,
+      xpData: [],
+      maxXp: 130,
+      totalXp: 0,
+      nivel: 1,
+      nivelProgresso: 0,
+      xpParaProximo: 500,
+      initData(xpData, streak, totalXp, nivel, nivelProgresso) {
+        this.streak = streak
+        this.xpData = xpData
+        this.totalXp = totalXp
+        this.nivel = nivel
+        this.nivelProgresso = nivelProgresso
+        this.maxXp = Math.max(130, Math.max(...xpData.map(d => d.xp)))
+        this.xpParaProximo = nivel * 500 - totalXp
+      },
+      continueLesson() {
+        window.location.href = document.querySelector('.btn-primary[href*="licao"]')?.href || '/cursos/licao/1/'
+      }
+    }))
+  })
+</script>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Recompensas - Plataforma Bíblica{% endblock %}
+{% block content %}
+<div class="flex min-h-screen bg-background" x-data="recompensas()" x-init='init({{ recompensas|safe }})'>
+  {% include 'includes/sidebar.html' %}
+
+  <main class="flex-1 p-8 overflow-y-auto">
+    <div class="mb-8">
+      <h1 class="font-heading text-heading-md text-primary">Recompensas</h1>
+      <p class="font-body text-text/60 mt-1">Seus baús e medalhas desbloqueados</p>
+    </div>
+
+    <template x-if="recompensasList.length === 0">
+      <div class="stat-card text-center py-12">
+        <div class="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-text/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+        </div>
+        <h3 class="font-heading text-heading-sm text-text/50 mb-2">Nenhuma recompensa ainda</h3>
+        <p class="font-body text-sm text-text/40">Complete lições e mantenha seu streak para desbloquear recompensas.</p>
+      </div>
+    </template>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <template x-for="(r, idx) in recompensasList" :key="idx">
+        <div class="stat-card relative overflow-hidden group">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center text-2xl" x-text="r.icone"></div>
+            <div>
+              <h3 class="font-heading text-heading-sm text-primary" x-text="r.titulo"></h3>
+              <span class="font-body text-label text-accent" x-text="r.tipo"></span>
+            </div>
+          </div>
+          <p class="font-body text-sm text-text/70 mb-4" x-text="r.descricao"></p>
+
+          <template x-if="!r.aberto">
+            <button @click="abrirBau(r.id, idx)" class="btn-accent w-full text-center text-sm" :disabled="r.abrindo">
+              <span x-text="r.abrindo ? 'Abrindo...' : 'Abrir Baú'"></span>
+            </button>
+          </template>
+          <template x-if="r.aberto">
+            <div class="flex items-center justify-between">
+              <span class="font-body text-sm text-green-600 font-medium">Aberto</span>
+              <span class="font-body text-sm text-accent font-medium" x-text="'+' + r.xp + ' XP'"></span>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('recompensas', () => ({
+      recompensasList: [],
+      init(data) { this.recompensasList = data || [] },
+      abrirBau(id, idx) {
+        this.recompensasList[idx].abrindo = true
+        fetch('/gamificacao/recompensas/' + id + '/abrir/', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            this.recompensasList[idx].aberto = true
+            this.recompensasList[idx].abrindo = false
+            this.recompensasList[idx].xp = data.xp
+          }
+        })
+        .catch(() => { this.recompensasList[idx].abrindo = false })
+      }
+    }))
+  })
+</script>
+{% endblock %}

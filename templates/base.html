@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Plataforma Bíblica{% endblock %}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="{% static 'js/app.js' %}"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500&display=swap');
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-background min-h-screen">
+  {% block content %}{% endblock %}
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

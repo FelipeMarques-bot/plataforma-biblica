@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500&display=swap");
+
+@layer base {
+  body {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    color: #3a475c;
+    background-color: #f9f9f7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Outfit", sans-serif;
+    font-weight: 600;
+    color: #0b2046;
+  }
+}
+
+@layer components {
+  .stat-card {
+    @apply bg-surface rounded-md shadow-soft p-6;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-surface rounded-[999px] px-6 py-3 font-heading font-medium text-button
+           hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 ease-in-out;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-primary rounded-[999px] px-6 py-3 font-heading font-medium text-button
+           hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 ease-in-out;
+  }
+
+  .btn-ghost {
+    @apply bg-surface border border-muted rounded-[999px] px-6 py-3 font-heading font-medium text-button text-text
+           hover:border-primary hover:shadow-soft transition-all duration-300 ease-in-out;
+  }
+
+  .skeleton {
+    @apply bg-muted rounded-md animate-pulse;
+  }
+
+  .glass-header {
+    @apply bg-surface/80 backdrop-blur-[12px] rounded-md px-6 py-4;
+  }
+}
+
+@layer utilities {
+  .text-small-uppercase {
+    @apply text-small font-medium uppercase tracking-small;
+  }
+}
+
+@keyframes pulse-gold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(212, 175, 55, 0);
+  }
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold 2s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+@keyframes xp-counter {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-xp {
+  animation: xp-counter 0.6s ease-out;
+}
+
+@keyframes typing {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.typing-dot {
+  animation: typing 1.4s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes chest-shake {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+.animate-chest-shake {
+  animation: chest-shake 0.5s ease-in-out;
+}
+
+@keyframes chest-open {
+  0% { transform: rotateX(0); }
+  100% { transform: rotateX(-110deg); }
+}
+
+.animate-chest-open {
+  animation: chest-open 0.8s ease-out forwards;
+  transform-origin: bottom;
+}
+
+@keyframes glow-reveal {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-glow-reveal {
+  animation: glow-reveal 0.6s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+@keyframes iris-wipe {
+  from { clip-path: circle(0% at 50% 50%); }
+  to { clip-path: circle(100% at 50% 50%); }
+}
+
+.animate-iris-wipe {
+  animation: iris-wipe 0.5s ease-out;
+}

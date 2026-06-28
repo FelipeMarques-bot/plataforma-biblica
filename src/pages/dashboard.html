@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Plataforma Bíblica</title>
+  <link rel="stylesheet" href="../../public/dist/output.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="../js/app.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500&display=swap');
+  </style>
+</head>
+<body class="bg-background min-h-screen" x-data="dashboard()" x-init>
+
+  <div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-[280px] bg-surface border-r border-muted shrink-0 flex flex-col py-8 px-4">
+      <div class="px-4 mb-10">
+        <h2 class="font-heading text-heading-sm text-primary flex items-center gap-2">
+          <span class="w-2 h-2 bg-accent rounded-full inline-block"></span>
+          Bíblia Study
+        </h2>
+      </div>
+      <nav class="flex-1 space-y-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-md bg-primary/5 text-primary font-medium transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Dashboard
+        </a>
+        <a href="trilhas.html" class="flex items-center gap-3 px-4 py-3 rounded-md text-text/70 hover:bg-primary/5 hover:text-primary transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+          Trilhas
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-md text-text/70 hover:bg-primary/5 hover:text-primary transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          Desafio Diário
+        </a>
+        <a href="serie-ouro.html" class="flex items-center gap-3 px-4 py-3 rounded-md text-text/70 hover:bg-primary/5 hover:text-primary transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+          Série Ouro
+        </a>
+        <a href="chat.html" class="flex items-center gap-3 px-4 py-3 rounded-md text-text/70 hover:bg-primary/5 hover:text-primary transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          Chat Devocional
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-md text-text/70 hover:bg-primary/5 hover:text-primary transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          Perfil
+        </a>
+      </nav>
+      <div class="px-4 mt-6">
+        <div class="bg-accent/10 rounded-md p-4 text-center">
+          <span class="font-heading text-heading-sm text-accent">34</span>
+          <p class="font-body text-label text-text/60">Sequência de estudos</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 overflow-y-auto">
+
+      <!-- Welcome -->
+      <div class="mb-8">
+        <h1 class="font-heading text-heading-md text-primary">Bom dia, João! ☀️</h1>
+        <p class="font-body text-text/60 mt-1">Continue sua jornada de estudos</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6">
+
+        <!-- Center: Streak + XP Chart -->
+        <div class="col-span-2 space-y-6">
+
+          <!-- Streak Widget -->
+          <div class="stat-card flex items-center gap-6">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center">
+                <svg class="w-7 h-7 text-accent" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              </div>
+              <div>
+                <p class="font-heading text-[40px] text-primary leading-none" x-text="streak">34</p>
+                <p class="font-body text-label text-text/60 mt-1">Sequência de estudos</p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <p class="font-body text-label text-text/60 mb-2">XP Semanal</p>
+              <div class="flex items-end gap-1.5 h-16">
+                <template x-for="(d, i) in xpData" :key="i">
+                  <div class="flex-1 flex flex-col items-center gap-1 group relative">
+                    <div
+                      class="w-full rounded-sm transition-all duration-300 cursor-pointer"
+                      :class="i === xpData.length - 1 ? 'bg-primary' : 'bg-muted'"
+                      :style="'height: ' + d.xp/maxXp * 100 + '%'"
+                    >
+                    </div>
+                    <span class="font-body text-[11px] text-text/50" x-text="d.day"></span>
+                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-surface text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap" x-text="'XP: ' + d.xp">
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="stat-card">
+            <h3 class="font-heading text-heading-sm text-primary mb-4">Atividade Recente</h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between py-2 border-b border-muted/50">
+                <span class="font-body text-text">Lição: A Criação (Gênesis 1)</span>
+                <span class="font-body text-sm text-accent font-medium">+120 XP</span>
+              </div>
+              <div class="flex items-center justify-between py-2 border-b border-muted/50">
+                <span class="font-body text-text">Desafio Diário: Pentateuco</span>
+                <span class="font-body text-sm text-accent font-medium">+80 XP</span>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="font-body text-text">Série Ouro: Gênesis Completo</span>
+                <span class="font-body text-sm text-accent font-medium">+250 XP</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: Próxima Ação -->
+        <div class="space-y-6">
+          <div class="stat-card">
+            <div class="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mb-4">
+              <span class="text-accent text-xl">🍎</span>
+            </div>
+            <h3 class="font-heading text-heading-sm text-primary mb-2">Continuar: A Queda</h3>
+            <p class="font-body text-sm text-text/60 mb-6">Gênesis 3 — O pecado original</p>
+            <button
+              class="btn-primary w-full text-center"
+              @click="continueLesson()"
+            >
+              Continuar lição
+            </button>
+          </div>
+
+          <div class="stat-card bg-primary text-surface">
+            <p class="font-body text-label text-accent mb-2">Total de XP</p>
+            <p class="font-heading text-heading-md text-surface" x-text="totalXp + ' XP'">695 XP</p>
+            <div class="w-full bg-white/20 rounded-full h-2 mt-4">
+              <div class="bg-accent h-2 rounded-full" style="width: 65%"></div>
+            </div>
+            <p class="font-body text-xs text-white/70 mt-2">Nível 7 — Próximo nível em 305 XP</p>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>

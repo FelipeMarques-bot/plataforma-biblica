@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Série Ouro — Plataforma Bíblica</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-[#0B2046] min-h-screen">
+  <div x-data="serieOuroApp()" class="flex min-h-screen">
+    <!-- Sidebar (dark) -->
+    <aside class="w-[280px] bg-[#0A1D3D] border-r border-white/10 flex-shrink-0 flex flex-col">
+      <div class="p-6 border-b border-white/10">
+        <h1 class="font-heading text-accent text-heading font-semibold tracking-tight">Logos</h1>
+        <p class="text-small text-white/40 mt-1">Série Ouro</p>
+      </div>
+      <nav class="flex-1 p-4 space-y-1">
+        <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-sm text-white/50 hover:text-white hover:bg-white/5 transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span class="text-small">Dashboard</span>
+        </a>
+        <a href="trilhas.html" class="flex items-center gap-3 px-4 py-3 rounded-sm text-white/50 hover:text-white hover:bg-white/5 transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+          <span class="text-small">Trilhas</span>
+        </a>
+        <a href="serie-ouro.html" class="flex items-center gap-3 px-4 py-3 rounded-sm bg-accent/10 text-accent font-medium transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
+          <span class="text-small">Série Ouro</span>
+        </a>
+        <a href="chat.html" class="flex items-center gap-3 px-4 py-3 rounded-sm text-white/50 hover:text-white hover:bg-white/5 transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          <span class="text-small">Chat devocional</span>
+        </a>
+      </nav>
+      <div class="p-4 border-t border-white/10">
+        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-sm text-white/50 hover:text-white hover:bg-white/5 transition-all duration-300">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          <span class="text-small">Perfil</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+          <h2 class="font-heading text-[40px] text-accent font-semibold tracking-tight">Série Ouro</h2>
+          <p class="text-white/50 text-body mt-2">Desafios avançados para quem busca mergulhar mais fundo</p>
+        </div>
+
+        <!-- Chest Row -->
+        <div class="flex items-center justify-center gap-8 mb-16">
+          <template x-for="(chest, index) in chests" :key="index">
+            <button @click="openChest(index)" :disabled="chest.isOpened || chest.isLocked"
+                    class="relative flex flex-col items-center group">
+              <!-- Chest Icon -->
+              <div class="w-40 h-40 rounded-md flex items-center justify-center transition-all duration-300"
+                   :class="{
+                     'bg-primary/30 border border-accent/30': !chest.isOpened && !chest.isLocked,
+                     'bg-primary/20 border border-accent/10 opacity-60': chest.isLocked,
+                     'bg-accent/10 border border-accent': chest.isOpened
+                   }">
+                <!-- Closed chest -->
+                <svg x-show="!chest.isOpened" class="w-24 h-24 text-accent/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                <!-- Opened chest -->
+                <div x-show="chest.isOpened" class="flex flex-col items-center animate-glow-reveal">
+                  <div class="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mb-1">
+                    <span class="text-[32px]" x-text="chest.reward.icon"></span>
+                  </div>
+                  <span class="text-small text-accent font-medium" x-text="chest.reward.label"></span>
+                </div>
+              </div>
+              <span class="text-small-uppercase text-white/40 mt-3" x-text="chest.name"></span>
+              <span class="text-small text-accent/60 mt-1" x-text="chest.isOpened ? 'Aberto' : chest.isLocked ? '🔒 ' + chest.unlockRequirement : 'Clique para abrir'"></span>
+            </button>
+          </template>
+        </div>
+
+        <!-- Challenge Cards -->
+        <h3 class="font-heading text-heading-lg text-accent mb-6">Desafios disponíveis</h3>
+        <div class="grid grid-cols-2 gap-6">
+          <template x-for="(challenge, index) in challenges" :key="index">
+            <div class="bg-primary/20 rounded-md p-6 border border-accent/20 hover:shadow-gold transition-all duration-300 group">
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-small-uppercase text-accent">Série Ouro</span>
+                <span class="text-small-uppercase text-white/40" x-text="challenge.difficulty"></span>
+              </div>
+              <h4 class="font-heading text-heading text-white mb-2" x-text="challenge.name"></h4>
+              <p class="text-body text-white/50 mb-4" x-text="challenge.desc"></p>
+              <div class="flex items-center justify-between">
+                <span class="text-small text-accent" x-text="challenge.reward"></span>
+                <button class="px-5 py-2 rounded-sm bg-accent text-primary text-small font-medium hover:brightness-110 transition-all">
+                  Iniciar
+                </button>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </main>
+
+    <!-- Reward Modal -->
+    <div x-show="showReward" x-cloak @click.outside="showReward = false"
+         class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 animate-fade-in">
+      <div class="bg-[#0B2046] border border-accent/40 rounded-md p-10 max-w-md text-center shadow-gold">
+        <div class="w-24 h-24 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6">
+          <span class="text-5xl">🏆</span>
+        </div>
+        <h3 class="font-heading text-heading-lg text-accent mb-2">Recompensa!</h3>
+        <p class="text-white/70 text-body mb-2" x-text="rewardMessage"></p>
+        <p class="text-accent font-heading text-heading font-semibold mb-6" x-text="'+' + rewardXP + ' XP'"></p>
+        <button @click="showReward = false" class="btn-accent">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function serieOuroApp() {
+      return {
+        showReward: false,
+        rewardMessage: '',
+        rewardXP: 0,
+        chests: [
+          {
+            name: 'Baú da Sabedoria',
+            isOpened: false,
+            isLocked: false,
+            unlockRequirement: '',
+            reward: { icon: '📜', label: '+500 XP' }
+          },
+          {
+            name: 'Baú do Conhecimento',
+            isOpened: false,
+            isLocked: true,
+            unlockRequirement: 'Complete 3 lições',
+            reward: { icon: '🕊️', label: 'Medalha da Fé' }
+          },
+          {
+            name: 'Baú da Coroa',
+            isOpened: false,
+            isLocked: true,
+            unlockRequirement: 'Série Ouro completa',
+            reward: { icon: '👑', label: 'Coroa de Ouro' }
+          }
+        ],
+        challenges: [
+          {
+            name: 'Sobrevivência',
+            desc: '50 questões sobre Gênesis em modo hard. Um erro e recomeça.',
+            difficulty: 'Extremo',
+            reward: '+1000 XP'
+          },
+          {
+            name: 'Profetas e Reis',
+            desc: 'Desafio cronológico sobre os profetas do Antigo Testamento.',
+            difficulty: 'Difícil',
+            reward: '+750 XP'
+          }
+        ],
+        openChest(index) {
+          const chest = this.chests[index];
+          if (chest.isOpened || chest.isLocked) return;
+          chest.isOpened = true;
+          this.rewardMessage = 'Você desbloqueou ' + chest.reward.label + '!';
+          this.rewardXP = 500;
+          this.showReward = true;
+        }
+      }
+    }
+  </script>
+</body>
+</html>

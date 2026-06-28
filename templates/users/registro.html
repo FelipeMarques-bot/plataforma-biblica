@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Criar Conta - Plataforma Bíblica{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-background flex items-center justify-center px-4 py-8">
+  <div class="stat-card max-w-lg w-full">
+    <div class="text-center mb-8">
+      <h1 class="font-heading text-heading-md text-primary">Criar Conta</h1>
+      <p class="font-body text-text/60 mt-1">Comece sua jornada de estudos</p>
+    </div>
+
+    {% if form.errors %}
+      <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 font-body text-sm">
+        Por favor, corrija os erros abaixo.
+      </div>
+    {% endif %}
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {% for field in form %}
+        <div>
+          <label class="font-body text-label text-text/70 block mb-1">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <p class="font-body text-xs text-text/50 mt-1">{{ field.help_text }}</p>
+          {% endif %}
+          {% if field.errors %}
+            {% for error in field.errors %}
+              <p class="font-body text-xs text-red-500 mt-1">{{ error }}</p>
+            {% endfor %}
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn-primary w-full text-center">Criar Conta</button>
+    </form>
+
+    <p class="text-center mt-6 font-body text-sm text-text/60">
+      Já tem conta?
+      <a href="{% url 'login' %}" class="text-accent font-medium hover:underline">Entrar</a>
+    </p>
+  </div>
+</div>
+
+<style>
+  input, select {
+    @apply w-full bg-background border border-muted rounded-md px-4 py-3 font-body text-text outline-none focus:border-primary transition-colors;
+  }
+</style>
+{% endblock %}

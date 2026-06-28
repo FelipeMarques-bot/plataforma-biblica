@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lição - Plataforma Bíblica</title>
+  <link rel="stylesheet" href="../../public/dist/output.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="../js/app.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500&display=swap');
+  </style>
+</head>
+<body class="bg-background min-h-screen" x-data="licao()">
+
+  <!-- Result Screen -->
+  <template x-if="showResult">
+    <div class="fixed inset-0 z-50 bg-background flex items-center justify-center crossfade">
+      <div class="stat-card max-w-lg w-full mx-4 text-center">
+        <div class="w-20 h-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-10 h-10 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <h2 class="font-heading text-heading-md text-primary mb-2">Lição Concluída!</h2>
+        <div class="py-6">
+          <span class="font-heading text-[56px] text-accent" x-text="'+' + xpGained + ' XP'"></span>
+        </div>
+        <p class="font-body text-text/60 mb-8">Continue sua jornada no mapa de trilhas</p>
+        <div class="flex gap-3 justify-center">
+          <button @click="backToMap()" class="btn-primary">Voltar ao mapa</button>
+          <a href="serie-ouro.html" class="btn-accent">Ver recompensas</a>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- Top Bar -->
+  <header class="fixed top-0 left-0 right-0 z-40 bg-surface/80 backdrop-blur-md border-b border-muted/30 px-8 py-4">
+    <div class="max-w-[680px] mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="trilhas.html" class="text-text/60 hover:text-primary transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </a>
+        <span class="font-body text-sm text-text/60" x-text="'Questão ' + (currentQuestion + 1) + ' de ' + questions.length"></span>
+      </div>
+      <span class="font-body text-sm font-medium text-accent" x-text="'+' + xpGained + ' XP'"></span>
+    </div>
+    <!-- Progress Bar -->
+    <div class="max-w-[680px] mx-auto mt-3">
+      <div class="w-full bg-muted rounded-full h-2">
+        <div class="bg-primary h-2 rounded-full transition-all duration-500" :style="'width: ' + progress + '%'"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Question Content -->
+  <main class="pt-28 pb-16 px-4">
+    <div class="max-w-[680px] mx-auto">
+      <div class="stat-card p-8 relative">
+
+        <!-- Question -->
+        <div class="mb-8">
+          <p class="font-heading text-heading-sm text-primary mb-1" x-text="'Questão ' + (currentQuestion + 1)"></p>
+          <h2 class="font-heading text-[24px] text-primary" x-text="currentQ.pergunta"></h2>
+        </div>
+
+        <!-- Options -->
+        <div class="space-y-3 mb-8">
+          <template x-for="(opcao, idx) in currentQ.opcoes" :key="idx">
+            <button
+              class="w-full text-left px-5 py-4 rounded-md border transition-all duration-300 font-body text-text"
+              :class="{
+                'border-primary shadow-soft': selectedOption === idx && !answered,
+                'border-muted hover:border-primary hover:shadow-soft': selectedOption !== idx && !answered,
+                'border-green-500 bg-green-50': answered && idx === currentQ.correta,
+                'border-red-400 bg-red-50 shake': answered && idx === selectedOption && idx !== currentQ.correta,
+                'border-muted opacity-60': answered && idx !== selectedOption && idx !== currentQ.correta
+              }"
+              @click="if(!answered) selectedOption = idx"
+            >
+              <span x-text="opcao"></span>
+            </button>
+          </template>
+        </div>
+
+        <!-- Feedback / Actions -->
+        <div class="flex items-center justify-between">
+          <!-- Tutor IA -->
+          <div class="relative">
+            <button
+              class="flex items-center gap-2 px-4 py-2 rounded-full border border-accent bg-surface text-accent font-body text-sm font-medium hover:shadow-gold transition-all duration-300"
+              @click="showDica = !showDica"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+              </svg>
+              Pedir Dica
+            </button>
+
+            <!-- Dica Popover -->
+            <div
+              x-show="showDica"
+              x-transition:enter="transition ease-out duration-200"
+              x-transition:enter-start="opacity-0 translate-y-2"
+              x-transition:enter-end="opacity-100 translate-y-0"
+              @click.outside="showDica = false"
+              class="absolute bottom-full left-0 mb-2 w-72 bg-surface border border-muted rounded-md p-4 shadow-soft"
+            >
+              <p class="font-body text-sm text-text">
+                <span class="font-medium text-accent">Dica:</span>
+                <span x-text="currentQ.dica"></span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Verificar / Continuar -->
+          <template x-if="!answered">
+            <button
+              class="btn-primary"
+              :class="{ 'opacity-50 cursor-not-allowed': selectedOption === null }"
+              :disabled="selectedOption === null"
+              @click="checkAnswer()"
+            >
+              Verificar
+            </button>
+          </template>
+          <template x-if="answered">
+            <div class="flex items-center gap-3">
+              <span class="font-body text-sm font-medium" x-text="correct ? '✅ Boa! Você acertou.' : '❌ Resposta incorreta.'"></span>
+              <button class="btn-primary" @click="nextQuestion()">
+                Continuar
+              </button>
+            </div>
+          </template>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

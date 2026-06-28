@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Desafio Diário - Plataforma Bíblica{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-background" x-data="desafioDiario()" x-init='init({{ desafio.id }}, {{ desafio.xp_recompensa }}, {{ concluido|yesno:"true,false" }})'>
+  {% include 'includes/sidebar.html' %}
+
+  <main class="flex-1 p-8 overflow-y-auto max-w-3xl mx-auto pt-12">
+    <a href="{% url 'dashboard' %}" class="text-text/60 hover:text-primary transition-colors inline-flex items-center gap-2 mb-8">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
+      </svg>
+      <span class="font-body text-sm">Voltar ao Dashboard</span>
+    </a>
+
+    <div class="stat-card p-8">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-14 h-14 bg-accent/10 rounded-full flex items-center justify-center">
+          <svg class="w-7 h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-heading text-heading-md text-primary">Desafio do Dia</h1>
+          <p class="font-body text-sm text-text/60">{{ desafio.data|date:"d \d\e F \d\e Y" }}</p>
+        </div>
+      </div>
+
+      <div class="mb-8">
+        <h2 class="font-heading text-heading-sm text-primary mb-2">{{ desafio.titulo }}</h2>
+        <p class="font-body text-text/80 mb-4">{{ desafio.descricao }}</p>
+
+        {% if desafio.versiculo %}
+        <div class="bg-primary/5 border border-primary/10 rounded-md p-4 mb-4">
+          <p class="font-heading text-sm text-accent font-medium mb-1">Versículo do Dia</p>
+          <p class="font-body text-text italic">{{ desafio.versiculo }}</p>
+        </div>
+        {% endif %}
+
+        {% if desafio.pergunta %}
+        <div class="mt-6">
+          <p class="font-body text-label text-text/70 mb-2">Reflexão</p>
+          <p class="font-body text-text">{{ desafio.pergunta }}</p>
+          <textarea x-model="reflexao" rows="3" class="w-full bg-background border border-muted rounded-md px-4 py-3 font-body text-sm text-text outline-none focus:border-primary transition-colors mt-3" placeholder="Escreva sua reflexão..."></textarea>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="flex items-center justify-between pt-6 border-t border-muted/30">
+        <div>
+          <span class="font-body text-label text-accent">Recompensa</span>
+          <p class="font-heading text-heading-sm text-accent">+{{ desafio.xp_recompensa }} XP</p>
+        </div>
+
+        <template x-if="!concluido">
+          <button @click="concluirDesafio()" class="btn-accent" :disabled="loading">
+            <span x-text="loading ? 'Concluindo...' : 'Concluir Desafio'"></span>
+          </button>
+        </template>
+        <template x-if="concluido">
+          <div class="flex items-center gap-2 text-green-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="font-body font-medium">Concluído hoje</span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('desafioDiario', () => ({
+      desafioId: null,
+      xpRecompensa: 0,
+      concluido: false,
+      loading: false,
+      reflexao: '',
+      init(id, xp, feito) {
+        this.desafioId = id
+        this.xpRecompensa = xp
+        this.concluido = feito
+      },
+      concluirDesafio() {
+        this.loading = true
+        fetch('/gamificacao/desafio-diario/' + this.desafioId + '/concluir/', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reflexao: this.reflexao })
+        })
+        .then(r => r.json())
+        .then(data => {
+          this.concluido = true
+          this.loading = false
+        })
+        .catch(() => { this.loading = false })
+      }
+    }))
+  })
+</script>
+{% endblock %}
