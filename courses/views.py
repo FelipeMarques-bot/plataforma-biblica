@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from .models import Trilha, LicaoBiblica, Exercicio, ProgressoUsuario
 from django.utils import timezone
+from gamification.utils import log_activity
 
 @login_required
 def lista_trilhas(request):
@@ -123,6 +124,13 @@ def finalizar_licao(request, licao_id):
     progresso.data_conclusao = timezone.now()
     progresso.xp_ganho_sessao += xp_bonus
     progresso.save()
+
+    log_activity(
+        request.user, 'LICAO_CONCLUIDA',
+        descricao=f'Concluiu a lição: {licao.titulo}',
+        referencia=str(licao.id),
+        xp_ganho=progresso.xp_ganho_sessao,
+    )
 
     return JsonResponse({
         'success': True,

@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import SessaoDevocional, MensagemDevocional
 from ia_engine.engine import gerar_devocional
+from gamification.utils import log_activity
 
 @login_required
 def chat_view(request):
@@ -56,6 +57,12 @@ def enviar_mensagem(request, sessao_id):
         sessao=sessao,
         remetente='ia',
         texto=resposta_ia,
+    )
+
+    log_activity(
+        request.user, 'CHAT_DEVOCIONAL',
+        descricao=f'Enviou mensagem no chat devocional (tema: {sessao.tema})',
+        referencia=str(sessao.id),
     )
 
     return JsonResponse({

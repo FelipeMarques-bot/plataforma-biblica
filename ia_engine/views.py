@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from courses.models import Exercicio, LicaoBiblica
 from .engine import gerar_dica_exercicio, gerar_explicacao_licao, gerar_devocional
+from gamification.utils import log_activity
 
 @login_required
 @csrf_exempt
@@ -29,6 +30,13 @@ def pedir_dica(request, exercicio_id):
     profile.pontos_para_ajuda -= custo
     profile.save()
 
+    log_activity(
+        request.user, 'DICA_IA',
+        descricao=f'Pediu dica para exercício {exercicio.id} da lição {exercicio.licao.titulo}',
+        referencia=str(exercicio.id),
+        xp_ganho=-custo,
+    )
+
     return JsonResponse({
         'dica': dica,
         'custo': custo,
@@ -51,6 +59,13 @@ def explicar_licao(request, licao_id):
     explicacao = gerar_explicacao_licao(licao)
     profile.pontos_para_ajuda -= custo
     profile.save()
+
+    log_activity(
+        request.user, 'EXPLICACAO_IA',
+        descricao=f'Solicitou explicação da lição: {licao.titulo}',
+        referencia=str(licao.id),
+        xp_ganho=-custo,
+    )
 
     return JsonResponse({
         'explicacao': explicacao,

@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.utils import timezone
 from .models import DesafioDiario, DesafioDiarioConcluido, Recompensa, RecompensaUsuario, SerieOuroDesafio, SerieOuroProgresso
+from .utils import log_activity
 
 @login_required
 def desafio_diario_view(request):
@@ -31,6 +32,12 @@ def concluir_desafio_diario(request, desafio_id):
         profile.xp_total += desafio.xp_recompensa
         profile.pontos_para_ajuda += desafio.xp_recompensa // 2
         profile.save()
+        log_activity(
+            request.user, 'DESAFIO_DIARIO',
+            descricao=f'Concluiu desafio: {desafio.titulo}',
+            referencia=str(desafio.id),
+            xp_ganho=desafio.xp_recompensa,
+        )
     return JsonResponse({'success': True, 'xp': desafio.xp_recompensa})
 
 @login_required
@@ -76,6 +83,12 @@ def abrir_bau(request, recompensa_id):
         profile = request.user.profile
         profile.xp_total += recomp.recompensa.xp_recompensa
         profile.save()
+        log_activity(
+            request.user, 'RECOMPENSA',
+            descricao=f'Abril baú: {recomp.recompensa.titulo}',
+            referencia=str(recomp.id),
+            xp_ganho=recomp.recompensa.xp_recompensa,
+        )
     return JsonResponse({
         'success': True,
         'titulo': recomp.recompensa.titulo,

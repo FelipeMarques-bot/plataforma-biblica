@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DesafioDiario, DesafioDiarioConcluido, Recompensa, RecompensaUsuario, SerieOuroDesafio, SerieOuroExercicio, SerieOuroProgresso
+from .models import DesafioDiario, DesafioDiarioConcluido, Recompensa, RecompensaUsuario, SerieOuroDesafio, SerieOuroExercicio, SerieOuroProgresso, UserActivityLog
 
 @admin.register(DesafioDiario)
 class DesafioDiarioAdmin(admin.ModelAdmin):
@@ -30,3 +30,10 @@ class SerieOuroExercicioAdmin(admin.ModelAdmin):
 @admin.register(SerieOuroProgresso)
 class SerieOuroProgressoAdmin(admin.ModelAdmin):
     list_display = ['usuario', 'desafio_ouro', 'concluido']
+
+@admin.register(UserActivityLog)
+class UserActivityLogAdmin(admin.ModelAdmin):
+    list_display = ['usuario', 'tipo_atividade', 'descricao_resumida', 'xp_ganho', 'data_hora']
+    list_filter = ['tipo_atividade', 'data_hora']
+    search_fields = ['usuario__username', 'usuario__email', 'descricao_resumida']
+    date_hierarchy = 'data_hora'

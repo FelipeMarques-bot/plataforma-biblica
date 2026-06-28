@@ -121,3 +121,30 @@ class SerieOuroProgresso(models.Model):
 
     def __str__(self):
         return f'{self.usuario.username} - {self.desafio_ouro.titulo}'
+
+
+class UserActivityLog(models.Model):
+    TIPO_CHOICES = [
+        ('LICAO_CONCLUIDA', 'Lição Concluída'),
+        ('DESAFIO_DIARIO', 'Desafio Diário'),
+        ('SERIE_OURO', 'Série Ouro'),
+        ('CHAT_DEVOCIONAL', 'Chat Devocional'),
+        ('DICA_IA', 'Dica da IA'),
+        ('EXPLICACAO_IA', 'Explicação da IA'),
+        ('RECOMPENSA', 'Recompensa'),
+        ('LOGIN', 'Login'),
+    ]
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='atividades')
+    tipo_atividade = models.CharField(max_length=30, choices=TIPO_CHOICES)
+    referencia = models.CharField(max_length=200, blank=True, help_text='ID ou referência da atividade')
+    descricao_resumida = models.TextField(blank=True)
+    xp_ganho = models.IntegerField(default=0)
+    data_hora = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Registro de Atividade'
+        verbose_name_plural = 'Registros de Atividades'
+        ordering = ['-data_hora']
+
+    def __str__(self):
+        return f'{self.usuario.username} - {self.get_tipo_atividade_display()} ({self.data_hora:%d/%m/%Y %H:%M})'
